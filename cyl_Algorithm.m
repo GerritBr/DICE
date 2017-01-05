@@ -2,7 +2,7 @@
 %% Simulation Parameters
 zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-NumFailuresBeforeExploStop = 600;                               % number of failures before exploration of the environment stops
+numFailuresBeforeExploStop = 600;                               % number of failures before exploration of the environment stops
 numFailuresToStartDisplay = 700;                                % number of failures before display started
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
@@ -48,7 +48,7 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
     valueAction1 = transitionProbs(state, : , 1) * value;       % calculating total value if action 1 is taken            
     valueAction2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
     %% Exploration moves with certain probability
-    if (numFailures<NumFailuresBeforeExploStop)                 
+    if (numFailures<numFailuresBeforeExploStop)                 
     explo_prob = exploProbability;                              % exploration with certain probability
     randomValue = rand(1);                                      % getting random value for determining exploratoin
     else
