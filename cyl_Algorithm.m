@@ -78,7 +78,7 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
 [z, z_dot, alpha] = cyl_dynamics(action, z, z_dot, alpha);      % calculating cylinder dynamics
 [newState] = get_state231(z, z_dot, zielTiefe);                 % getting new state
 time = time + 1;                                                % raising time step
-if displayStarted==1
+if time-timeAtStartOfCurrentTrial > 100000 %displayStarted==1
 realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
 show_cyl(action, z, z_dot, alpha, zielTiefe, realTimeOfTrial);  % visialization of the cylinder
 end
@@ -150,7 +150,9 @@ if (numFailures > ...                                               %starting di
 displayStarted = 1;
 end
 %% Reinitiate State
-z = zielTiefe-0.01 + 2*rand(1)/100; z_dot = 0; alpha = 0;                            %reinitiation of the next trial
+z = zielTiefe; %zielTiefe-0.01 + 2*rand(1)/100; 
+z_dot = 0; 
+alpha = 0;                            %reinitiation of the next trial
 else
 state = newState;                                               %updating state
 end
