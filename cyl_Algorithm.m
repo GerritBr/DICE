@@ -3,12 +3,12 @@
 zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 600;                               % number of failures before exploration of the environment stops
-numFailuresToStartDisplay = 700;                                % number of failures before display started
+numFailuresToStartDisplay =700;                                % number of failures before display started
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.05;                                        % probability of an explorational action
 maxFailures = 6000000;                                          % max number of failures before termination
-tolerance   = 0.001;                                            % tolerance of change in value
+tolerance   = 0.00001;                                            % tolerance of change in value
 noLearningThreshold = 100;                                      % termination criterion
 displayStarted = numFailuresToStartDisplay == 0;
 %% Timeparameters
@@ -45,8 +45,8 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
     zielTiefe   = 0.7 + sin(time/200) * 0.02; 
     end
     %% Calculation score value to decide next action
-    valueAction1 = transitionProbs(state, : , 1) * value;       % calculating total value if action 1 is taken            
-    valueAction2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
+    actionValue1 = transitionProbs(state, : , 1) * value;       % calculating total value if action 1 is taken            
+    actionValue2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
     %% Exploration moves with certain probability
     if (numFailures<numFailuresBeforeExploStop)                 
     explo_prob = exploProbability;                              % exploration with certain probability
@@ -55,13 +55,13 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
     explo_prob = 0;
     end
     %% Determie next action 
-    if (valueAction1 > valueAction2)                                                        
+    if (actionValue1 > actionValue2)                                                        
          if (randomValue > explo_prob)                          % if random value greater exploration parameter, no exploration
         action = 1;                                             % if no exploration take action 1
          else 
         action = 2;                                             % else, take action 2 as exploration move
          end
-    elseif (valueAction2 > valueAction1)
+    elseif (actionValue2 > actionValue1)
          if (randomValue > explo_prob)
         action = 2;
          else 
@@ -150,7 +150,7 @@ if (numFailures > ...                                               %starting di
 displayStarted = 1;
 end
 %% Reinitiate State
-z = zielTiefe; z_dot = 0; alpha = 0;                            %reinitiation of the next trial
+z = zielTiefe-0.01 + 2*rand(1)/100; z_dot = 0; alpha = 0;                            %reinitiation of the next trial
 else
 state = newState;                                               %updating state
 end

@@ -39,7 +39,7 @@ V_W = a_diaphr * h_Hub;                     % calculating variable volume of dia
 z_0 = [z; z_dot];
 zhat = zeros(2,1);
 zhat(1) = z_0(2);
-zhat(2) = zhat(1) + sign(zhat(1)) * zhat(1)^2 * k * tau / m_C + tau * rho_W * g * (V_W + V0+V0_err) / m_C  - tau * g;
+zhat(2) = zhat(1) + sign(zhat(1)) * zhat(1)^2 * k * tau / m_C + tau * rho_W * g * (V_W + V0-V0_err) / m_C  - tau * g;
 % Return the new state variables (using Euler's method)
 new_z  = z + tau * zhat(2);
 new_z_dot = zhat(2);
