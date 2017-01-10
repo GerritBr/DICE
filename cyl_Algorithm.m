@@ -1,12 +1,14 @@
 %Learning Algorithm diving_cylinder
+clc;
+close all;
 %% Simulation Parameters
 zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 600;                               % number of failures before exploration of the environment stops
+numFailuresBeforeExploStop = 250;                               % number of failures before exploration of the environment stops
 numFailuresToStartDisplay =700;                                % number of failures before display started
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
-exploProbability = 0.05;                                        % probability of an explorational action
+exploProbability = 0.10;                                        % probability of an explorational action
 maxFailures = 6000000;                                          % max number of failures before termination
 tolerance   = 0.00001;                                            % tolerance of change in value
 noLearningThreshold = 100;                                      % termination criterion
@@ -78,7 +80,7 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
 [z, z_dot, alpha] = cyl_dynamics(action, z, z_dot, alpha);      % calculating cylinder dynamics
 [newState] = get_state231(z, z_dot, zielTiefe);                 % getting new state
 time = time + 1;                                                % raising time step
-if time-timeAtStartOfCurrentTrial > 100000 %displayStarted==1
+if time-timeAtStartOfCurrentTrial > 1000000 %displayStarted==1
 realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
 show_cyl(action, z, z_dot, alpha, zielTiefe, realTimeOfTrial);  % visialization of the cylinder
 end
@@ -150,7 +152,7 @@ if (numFailures > ...                                               %starting di
 displayStarted = 1;
 end
 %% Reinitiate State
-z = zielTiefe; %zielTiefe-0.01 + 2*rand(1)/100; 
+z = zielTiefe-0.01 + 2*rand(1)/100; 
 z_dot = 0; 
 alpha = 0;                            %reinitiation of the next trial
 else
