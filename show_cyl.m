@@ -46,7 +46,7 @@ line ([-0.1 0.1], [zielTiefe+0.01 zielTiefe+0.01], 'color', 'red')
 %diving cell
 rectangle('Position', [-0.02, z-0.045, 0.04, 0.09], 'FaceColor', 'cyan');
 rectangle('Position', [-0.01, z+0.045+m, 0.02, h], 'FaceColor', 'red');
-axis([-0.05 0.05 0.6 0.8]);
+axis([-0.05 0.05 zielTiefe-0.10 zielTiefe+0.10]);
 grid on;
 ylabel ('depth [m]')
 set(gca,'xtick',[])
@@ -59,7 +59,7 @@ hold on;
 plot(timePlot,zielTiefePlot,'g')
 plot(timePlot,zielTiefePlot-0.01,'r')
 plot(timePlot,zielTiefePlot+0.01,'r')
-axis([realTimeOfTrial- 10, realTimeOfTrial, 0.60, 0.80]);
+axis([realTimeOfTrial- 10, realTimeOfTrial, zielTiefe-0.10, zielTiefe+0.10]);
 grid on;
 xlabel ('time [s]');
 ylabel ('depth [m]')
