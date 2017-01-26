@@ -4,7 +4,7 @@ close all;
 %% Simulation Parameters
 zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 350;                               % number of failures before exploration of the environment stops
+numFailuresBeforeExploStop = 300;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 10000;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
