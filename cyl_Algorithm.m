@@ -2,17 +2,15 @@
 clc;
 close all;
 %% Simulation Parameters
-zielTiefe   = 0.8;                                              % target depth          
+zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 250;                               % number of failures before exploration of the environment stops
-numFailuresToStartDisplay =700;                                % number of failures before display started
+numFailuresBeforeExploStop = 350;                               % number of failures before exploration of the environment stops
+timeBeforStartDisplay = 10000;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
-maxFailures = 6000000;                                          % max number of failures before termination
 tolerance   = 0.00001;                                            % tolerance of change in value
 noLearningThreshold = 100;                                      % termination criterion
-displayStarted = numFailuresToStartDisplay == 0;
 %% Timeparameters
 time = 0;                                                       % overall timsteps of calculation
 timeStepsToFailure = [];                                        % timesteps before failure happened
@@ -20,15 +18,15 @@ numFailures = 0;                                                % initial value 
 timeAtStartOfCurrentTrial = 0;                                  % initial timestep 
 %% Sarting state
 z = zielTiefe; z_dot = 0.0;                                     % definition of the starting state
-state = get_state231(z, z_dot, zielTiefe);                      % calculation of the starting state
-numStates   = 231;                                              % number of total states+2 (from get_state231)
+state = get_state111(z, z_dot, zielTiefe);                      % calculation of the starting state
+terminalState   = 111;                                              % number of total states+2 (from get_state111)
 %% Setup of transition and reward
 if (useExistingProperties == 0)
-transitionCounts  = zeros(numStates, numStates, 2);             % matrix to count transitions from state to state under action x
-transitionProbs = zeros(numStates, numStates, 2)/numStates;     % matrix for transition probabilities from state to state
-rewardCounts = zeros(numStates, 2);                             % setting up reward counts
-reward =zeros(numStates, 1);                                    % setting up rewards
-value = zeros(numStates, 1);                                    % setting up values of the states
+transitionCounts  = zeros(terminalState, terminalState, 2);             % matrix to count transitions from state to state under action x
+transitionProbs = zeros(terminalState, terminalState, 2)/terminalState;     % matrix for transition probabilities from state to state
+rewardCounts = zeros(terminalState, 2);                             % setting up reward counts
+reward = zeros(terminalState, 1);                                    % setting up rewards
+value = zeros(terminalState, 1);                                    % setting up values of the states
 end
 consecutiveNoLearningTrials = 0;                                % initial value of consecutiveNoLearningTrials
 alpha =0;                                                       % initial value of alpha
@@ -78,14 +76,15 @@ while (consecutiveNoLearningTrials < noLearningThreshold)
     end
  %% Calculation equation of motion and new state under action x
 [z, z_dot, alpha] = cyl_dynamics(action, z, z_dot, alpha);      % calculating cylinder dynamics
-[newState] = get_state231(z, z_dot, zielTiefe);                 % getting new state
+[newState] = get_state111(z, z_dot, zielTiefe);                 % getting new state
 time = time + 1;                                                % raising time step
-if time-timeAtStartOfCurrentTrial > 10000 %displayStarted==1
+z_dotmess(time)=abs(z_dot);
+if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
  realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
  show_cyl(action, z, z_dot, alpha, zielTiefe, realTimeOfTrial);  % visialization of the cylinder
 end
 %% Reward of the last step
-if (newState == numStates)
+if (newState == terminalState)
         R = -1;                                                 % negative reward if newState is terminal state
 else
         R = 0;                                                  % no reward else
@@ -96,45 +95,45 @@ transitionCounts(state, newState, action) = ...                 % updating trasi
 rewardCounts(newState, 1) = rewardCounts(newState, 1) +R;       % updating total rewad for new state
 rewardCounts(newState, 2) = rewardCounts(newState, 2) +1;       % updating rewad counts for new state
 % Updating transition properties (policy) 
-if (newState==numStates)                                        
-for a = 1:2                                                     % updating transition probabilities of all states under action 1/2
-for s = 1:numStates                                            
-den = sum(transitionCounts(s,:,a));                             % summing up all transitions in state s under action a
-if (den > 0)
-transitionProbs(s, :, a) = transitionCounts(s, :, a) /den;      % calculating new probability through transitionConts and den
-end
-end
-end
-for s = 1:numStates                                             % calculating reward of last step
-if (rewardCounts(s, 2) > 0)
-reward(s) = rewardCounts(s, 1) / rewardCounts(s, 2);            
-end
-end
-%% Updating state values until convergence
-iterations = 0;
-newValue = zeros(numStates, 1);
-while true
-iterations = iterations + 1;
-for s =1:numStates
-newActionValue1 = transitionProbs(s,:,1) * value;                        % calculating value of states under action 1
-newActionValue2 = transitionProbs(s,:,2) * value;                        % calculating value of states under action 2                       
-newValue(s) = max([newActionValue1, newActionValue2]);                            % getting maximum value of states
-end
-newValue = reward + gamma * newValue;                           % updating new value with reward (Bellman equation) 
-diff = max(abs(value - newValue));                              % checking change of value function
-value = newValue;
-if (diff < tolerance)                                           % if change in value function < tolerance terminate
-    break;
-end
-end
-if (iterations == 1)
-consecutiveNoLearningTrials = consecutiveNoLearningTrials + 1;  %counts of no Learning (change in value function < tolerance)
-else 
-consecutiveNoLearningTrials = 0;
-end
+if (newState==terminalState)                                        
+    for a = 1:2                                                     % updating transition probabilities of all states under action 1/2
+        for s = 1:terminalState                                            
+            den = sum(transitionCounts(s,:,a));                             % summing up all transitions in state s under action a
+                if (den > 0)
+                transitionProbs(s, :, a) = transitionCounts(s, :, a) /den;      % calculating new probability through transitionConts and den
+                end
+        end
+    end
+    for s = 1:terminalState                                             % calculating reward of last step
+        if (rewardCounts(s, 2) > 0)
+            reward(s) = rewardCounts(s, 1) / rewardCounts(s, 2);            
+        end
+    end
+    %% Updating state values until convergence
+    iterations = 0;
+    newValue = zeros(terminalState, 1);
+    while true
+        iterations = iterations + 1;
+        for s =1:terminalState
+            newActionValue1 = transitionProbs(s,:,1) * value;                        % calculating value of states under action 1
+            newActionValue2 = transitionProbs(s,:,2) * value;                        % calculating value of states under action 2                       
+            newValue(s) = max([newActionValue1, newActionValue2]);                            % getting maximum value of states
+        end
+        newValue = reward + gamma * newValue;                           % updating new value with reward (Bellman equation) 
+        diff = max(abs(value - newValue));                              % checking change of value function
+        value = newValue;
+        if (diff < tolerance)                                           % if change in value function < tolerance terminate
+            break;
+        end
+    end
+    if (iterations == 1)
+        consecutiveNoLearningTrials = consecutiveNoLearningTrials + 1;  %counts of no Learning (change in value function < tolerance)
+    else 
+        consecutiveNoLearningTrials = 0;
+    end
 end
 %% Resetting plot parameters
-if (newState == numStates)
+if (newState == terminalState)
 realTimeOfTrial = 0;                                            %resetting real time of current trial in s
 timePlot = [];
 zPlot = [];
@@ -147,10 +146,6 @@ zielTiefePlot =1;
 numFailures = numFailures + 1                                       %number of Failures
 timeStepsToFailure(numFailures) = time - timeAtStartOfCurrentTrial; %vector consiting of number of time steps 
 timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial                               
-if (numFailures > ...                                               %starting display when certain number of failures happened (definition above)
-    numFailuresToStartDisplay-1)
-displayStarted = 1;
-end
 %% Reinitiate State
 z = zielTiefe-0.01 + 2*rand(1)/100; 
 z_dot = 0; 
