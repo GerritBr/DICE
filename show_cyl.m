@@ -1,5 +1,5 @@
 % This function displays the "animation"
-function [] = show_cyl(action, z, z_dot, alpha, zielTiefe, realTimeOfTrial)
+function [] = show_cyl(action, z, z_dot, alpha, zielTiefe, positionTol, realTimeOfTrial)
 %% Defining global plot variables
 global timePlot
 global zPlot
@@ -7,11 +7,12 @@ global zielTiefePlot
 global k
 set(gcf,'DoubleBuffer','on');
 %% plot parameters for diaphrgm
-h_Membran = 10 * (alpha/57.5)/1000;  %Calculating diaphragm stroke for visualation
-if(sign(h_Membran) == 1)
+alpha_max=115;
+h_Membran = (-10 +20*(alpha/alpha_max)) /1000;  %Calculating diaphragm stroke for visualation
+if(sign(h_Membran) == -1)
    m = 0;
    h = abs(h_Membran);
-elseif(sign(h_Membran) == -1)
+elseif(sign(h_Membran) == 1)
     m = -abs(h_Membran);
     h = abs(h_Membran);
 else
@@ -41,8 +42,8 @@ plot(0, -z);
 %target depth and boundary lines
 line ([-0.1 0.1], [z z]) 
 line ([-0.1 0.1], [zielTiefe zielTiefe], 'color', 'green') 
-line ([-0.1 0.1], [zielTiefe-0.01 zielTiefe-0.01], 'color', 'red') 
-line ([-0.1 0.1], [zielTiefe+0.01 zielTiefe+0.01], 'color', 'red') 
+line ([-0.1 0.1], [zielTiefe-positionTol zielTiefe-positionTol], 'color', 'red') 
+line ([-0.1 0.1], [zielTiefe+positionTol zielTiefe+positionTol], 'color', 'red') 
 %diving cell
 rectangle('Position', [-0.02, z-0.045, 0.04, 0.09], 'FaceColor', 'cyan');
 rectangle('Position', [-0.01, z+0.045+m, 0.02, h], 'FaceColor', 'red');
@@ -57,8 +58,8 @@ h2 = subplot('Position',positionVector2);
 plot(timePlot,zPlot,'b')
 hold on;
 plot(timePlot,zielTiefePlot,'g')
-plot(timePlot,zielTiefePlot-0.01,'r')
-plot(timePlot,zielTiefePlot+0.01,'r')
+plot(timePlot,zielTiefePlot-positionTol,'r')
+plot(timePlot,zielTiefePlot+positionTol,'r')
 axis([realTimeOfTrial- 10, realTimeOfTrial, zielTiefe-0.10, zielTiefe+0.10]);
 grid on;
 xlabel ('time in s');

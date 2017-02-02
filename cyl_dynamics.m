@@ -10,30 +10,30 @@ m_C = rho_W*V0;                     % mass of cylinder in kg
 V0_err = 0.01* V0;                  % volumenerror hier positiv 1% des Gesamtvolumens
 tau = 0.025;                        % time for calculation = 0.025s
 %% Setting up Diaphragm parameters
-alpha_max = 57.5;                           % max. angle of motor in one direction
+alpha_max = 115;                           % max. angle of motor in one direction
 s_ges = 0.5;                                % time for complete change of Volume (-Vmax to Vmax)
 h = 0;                                      % stroke of diaphragm in m
 a_diaphr = 707/10^6;                        % area of diaphragm in m^2
 V_W = 0;                                    % variable volume of diving cell. Calculated through h and a_diaphr
-volumeStep = tau * 2 * alpha_max/(s_ges);   % max summable volume during calculation time
+volumeStep = tau * alpha_max/(s_ges);   % max summable volume during calculation time
 %% Target depth
 zielTiefe = 0.7;                            % target depth of diving cell
 %% Variation of volume
 if (action == 1)
-   if (alpha >= (-alpha_max + volumeStep))  % if aplpha smaller than -maximum + volumestep subtract a volumestep
-    alpha_new = alpha - tau * 2 * alpha_max/(s_ges) ;
+   if (alpha >= (volumeStep))  % if aplpha smaller than -maximum + volumestep subtract a volumestep
+    alpha_new = alpha - tau * alpha_max/(s_ges) ;
     else 
-    alpha_new = -alpha_max;                                 
+    alpha_new = 0;                                 
     end
 elseif (action == 2)
     if (alpha <= (alpha_max - volumeStep))  % if aplpha smaller than maximum - volumestep add a volumestep
-    alpha_new = alpha + tau * 2 * alpha_max/(s_ges) ;
+    alpha_new = alpha + tau * alpha_max/(s_ges) ;
     else 
       alpha_new = alpha_max;
     end
 end
 alpha = alpha_new;
-h_Hub = -10 * (alpha/alpha_max) /1000;      % calculate stroke of diaphragm in m
+h_Hub = (-10 +20*(alpha/alpha_max)) /1000;      % calculate stroke of diaphragm in m
 V_W = a_diaphr * h_Hub;                     % calculating variable volume of diaphragm in m^3
 %% equations of motion
 z_0 = [z; z_dot];

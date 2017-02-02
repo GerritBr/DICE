@@ -3,6 +3,7 @@ clc;
 close all;
 %% Simulation Parameters
 zielTiefe   = 0.7;                                              % target depth          
+positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 1000;
@@ -17,7 +18,7 @@ numFailures = 0;                                                % initial value 
 timeAtStartOfCurrentTrial = 0;                                  % initial timestep 
 %% Sarting state
 z = zielTiefe; z_dot = 0.0;                                     % definition of the starting state
-state = get_state111(z, z_dot, zielTiefe);                      % calculation of the starting state
+state = get_state111(z, z_dot, zielTiefe, positionTol);                      % calculation of the starting state
 terminalState   = 111;                                              % number of total states+2 (from get_state111)
 %% Setup of transition and reward
 if (useExistingProperties == 0)
@@ -27,8 +28,9 @@ rewardCounts = zeros(terminalState, 2);                             % setting up
 reward = zeros(terminalState, 1);                                    % setting up rewards
 value = zeros(terminalState, 1);                                    % setting up values of the states
 end
-alpha =0;                                                       % initial value of alpha
-%% Definition of plot parameter
+alpha =0;     % initial value of alpha
+
+%% Definition of plot parameter (not part of the algorithm)
 global timePlot;
 global zPlot;
 global zielTiefePlot,
@@ -37,6 +39,8 @@ k = 1;
 timePlot(1)=0;
 zPlot(1)=0;
 zielTiefePlot(1)=0;
+
+
 %% Loop 
 while (time < 5000000)
     %% Calculation score value to decide next action
@@ -71,13 +75,9 @@ while (time < 5000000)
     end
  %% Calculation equation of motion and new state under action x
 [z, z_dot, alpha] = cyl_dynamics(action, z, z_dot, alpha);      % calculating cylinder dynamics
-[newState] = get_state111(z, z_dot, zielTiefe);                 % getting new state
+[newState] = get_state111(z, z_dot, zielTiefe, positionTol);                 % getting new state
 time = time + 1;                                                % raising time step
-z_dotmess(time)=abs(z_dot);
-if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
- realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
- show_cyl(action, z, z_dot, alpha, zielTiefe, realTimeOfTrial);  % visialization of the cylinder
-end
+
 %% Reward of the last step
 if (newState == terminalState)
         R = -1;                                                 % negative reward if newState is terminal state
@@ -110,9 +110,9 @@ if (newState==terminalState)
     while true
         iterations = iterations + 1;
         for s =1:terminalState
-            newActionValue1 = transitionProbs(s,:,1) * value;                        % calculating value of states under action 1
-            newActionValue2 = transitionProbs(s,:,2) * value;                        % calculating value of states under action 2                       
-            newValue(s) = max([newActionValue1, newActionValue2]);                            % getting maximum value of states
+            newValue1 = transitionProbs(s,:,1) * value;                        % calculating value of states under action 1
+            newValue2 = transitionProbs(s,:,2) * value;                        % calculating value of states under action 2                       
+            newValue(s) = max([newValue1, newValue2]);                            % getting maximum value of states
         end
         newValue = reward + gamma * newValue;                           % updating new value with reward (Bellman equation) 
         diff = max(abs(value - newValue));                              % checking change of value function
@@ -122,7 +122,12 @@ if (newState==terminalState)
         end
     end
 end
-%% Resetting plot parameters
+
+%% Resetting plot parameters (not part of the algorithm)
+if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
+ realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
+ show_cyl(action, z, z_dot, alpha, zielTiefe, positionTol, realTimeOfTrial);  % visialization of the cylinder
+end
 if (newState == terminalState)
 realTimeOfTrial = 0;                                            %resetting real time of current trial in s
 timePlot = [];
@@ -133,10 +138,12 @@ k = 1;
 timePlot = 1;
 zPlot =1;
 zielTiefePlot =1;
+end 
+%% %% Reinitiate State
+if (newState == terminalState)
 numFailures = numFailures + 1                                       %number of Failures
 timeStepsToFailure(numFailures) = time - timeAtStartOfCurrentTrial; %vector consiting of number of time steps 
 timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial                               
-%% Reinitiate State
 z = zielTiefe-0.01 + 2*rand(1)/100; 
 z_dot = 0; 
 alpha = 0;                            %reinitiation of the next trial
