@@ -10,7 +10,6 @@ wave = 0;                                                       % produces a wav
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
 tolerance   = 0.01;                                            % tolerance of change in value
-noLearningThreshold = 100;                                      % termination criterion
 %% Timeparameters
 time = 0;                                                       % overall timsteps of calculation
 timeStepsToFailure = [];                                        % timesteps before failure happened
@@ -28,7 +27,6 @@ rewardCounts = zeros(terminalState, 2);                             % setting up
 reward = zeros(terminalState, 1);                                    % setting up rewards
 value = zeros(terminalState, 1);                                    % setting up values of the states
 end
-consecutiveNoLearningTrials = 0;                                % initial value of consecutiveNoLearningTrials
 alpha =0;                                                       % initial value of alpha
 %% Definition of plot parameter
 global timePlot;
@@ -41,9 +39,6 @@ zPlot(1)=0;
 zielTiefePlot(1)=0;
 %% Loop 
 while (time < 5000000)
-    if wave == 1;                                               % wave function as target depth (important dynamics of DICE are not concerned hereby)
-    zielTiefe   = 0.7 + sin(time/200) * 0.02; 
-    end
     %% Calculation score value to decide next action
     actionValue1 = transitionProbs(state, : , 1) * value;       % calculating total value if action 1 is taken            
     actionValue2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
@@ -123,14 +118,8 @@ if (newState==terminalState)
         diff = max(abs(value - newValue));                              % checking change of value function
         value = newValue;
         if (diff < tolerance)                                           % if change in value function < tolerance terminate
-            diff
             break;
         end
-    end
-    if (iterations == 1)
-        consecutiveNoLearningTrials = consecutiveNoLearningTrials + 1;  %counts of no Learning (change in value function < tolerance)
-    else 
-        consecutiveNoLearningTrials = 0;
     end
 end
 %% Resetting plot parameters
