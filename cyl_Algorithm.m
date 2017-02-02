@@ -4,12 +4,12 @@ close all;
 %% Simulation Parameters
 zielTiefe   = 0.7;                                              % target depth          
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 300;                               % number of failures before exploration of the environment stops
-timeBeforStartDisplay = 10000;
+numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
+timeBeforStartDisplay = 1000;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
-tolerance   = 0.00001;                                            % tolerance of change in value
+tolerance   = 0.01;                                            % tolerance of change in value
 noLearningThreshold = 100;                                      % termination criterion
 %% Timeparameters
 time = 0;                                                       % overall timsteps of calculation
@@ -40,7 +40,7 @@ timePlot(1)=0;
 zPlot(1)=0;
 zielTiefePlot(1)=0;
 %% Loop 
-while (consecutiveNoLearningTrials < noLearningThreshold)
+while (time < 5000000)
     if wave == 1;                                               % wave function as target depth (important dynamics of DICE are not concerned hereby)
     zielTiefe   = 0.7 + sin(time/200) * 0.02; 
     end
@@ -123,6 +123,7 @@ if (newState==terminalState)
         diff = max(abs(value - newValue));                              % checking change of value function
         value = newValue;
         if (diff < tolerance)                                           % if change in value function < tolerance terminate
+            diff
             break;
         end
     end

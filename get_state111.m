@@ -1,5 +1,5 @@
 % This function returns a discretized value (a number) for a continuous state vector. 
-function [state] = get_state(z, z_dot, zielTiefe)
+function [state] = get_state111(z, z_dot, zielTiefe)
 total_states=111; %2 more than maxmimum number of states
 positionTol = 0.01; %positionToleraz which gives the boarder of Failure in one direction. positionTol is discretizised with 5 steps
 %% Discretising position

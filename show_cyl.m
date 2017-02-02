@@ -48,7 +48,7 @@ rectangle('Position', [-0.02, z-0.045, 0.04, 0.09], 'FaceColor', 'cyan');
 rectangle('Position', [-0.01, z+0.045+m, 0.02, h], 'FaceColor', 'red');
 axis([-0.05 0.05 zielTiefe-0.10 zielTiefe+0.10]);
 grid on;
-ylabel ('depth [m]')
+ylabel ('depth in m')
 set(gca,'xtick',[])
 set(gca,'xticklabel',[])
 set(gca,'YDir','reverse'); 
@@ -61,7 +61,7 @@ plot(timePlot,zielTiefePlot-0.01,'r')
 plot(timePlot,zielTiefePlot+0.01,'r')
 axis([realTimeOfTrial- 10, realTimeOfTrial, zielTiefe-0.10, zielTiefe+0.10]);
 grid on;
-xlabel ('time [s]');
-ylabel ('depth [m]')
+xlabel ('time in s');
+ylabel ('depth in m')
 set(gca,'YDir','reverse');
 drawnow;
