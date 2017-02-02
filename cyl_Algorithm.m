@@ -2,7 +2,7 @@
 clc;
 close all;
 %% Simulation Parameters
-zielTiefe   = 0.7;                                              % target depth          
+zd = [0.7, 0.0, 0.0];                                           % target [zd, z_dotd, z_ddotd]          
 positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
@@ -17,8 +17,8 @@ timeStepsToFailure = [];                                        % timesteps befo
 numFailures = 0;                                                % initial value of Failures
 timeAtStartOfCurrentTrial = 0;                                  % initial timestep 
 %% Sarting state
-z = zielTiefe; z_dot = 0.0;                                     % definition of the starting state
-state = get_state111(z, z_dot, zielTiefe, positionTol);                      % calculation of the starting state
+z = [zd(1), 0.0, 0.0];                                      % starting state [z, z_dot, z_ddot];
+state = get_state111(z, zd, positionTol);                      % calculation of the starting state
 terminalState   = 111;                                              % number of total states+2 (from get_state111)
 %% Setup of transition and reward
 if (useExistingProperties == 0)
@@ -74,8 +74,8 @@ while (time < 5000000)
         end
     end
  %% Calculation equation of motion and new state under action x
-[z, z_dot, alpha] = cyl_dynamics(action, z, z_dot, alpha);      % calculating cylinder dynamics
-[newState] = get_state111(z, z_dot, zielTiefe, positionTol);                 % getting new state
+[z, alpha] = cyl_dynamics(action, z, alpha);      % calculating cylinder dynamics
+[newState] = get_state111(z, zd, positionTol);                 % getting new state
 time = time + 1;                                                % raising time step
 
 %% Reward of the last step
@@ -126,7 +126,7 @@ end
 %% Resetting plot parameters (not part of the algorithm)
 if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
  realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
- show_cyl(action, z, z_dot, alpha, zielTiefe, positionTol, realTimeOfTrial);  % visialization of the cylinder
+ show_cyl(action, z, zd, alpha, positionTol, realTimeOfTrial);  % visialization of the cylinder
 end
 if (newState == terminalState)
 realTimeOfTrial = 0;                                            %resetting real time of current trial in s
@@ -144,8 +144,8 @@ if (newState == terminalState)
 numFailures = numFailures + 1                                       %number of Failures
 timeStepsToFailure(numFailures) = time - timeAtStartOfCurrentTrial; %vector consiting of number of time steps 
 timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial                               
-z = zielTiefe-0.01 + 2*rand(1)/100; 
-z_dot = 0; 
+z(1) = zd(1)-0.01 + 2*rand(1)/100; 
+z(2) = 0; 
 alpha = 0;                            %reinitiation of the next trial
 else
 state = newState;                                               %updating state

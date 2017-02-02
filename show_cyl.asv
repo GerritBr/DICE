@@ -23,7 +23,7 @@ end
 if (k < 400)
 timePlot(k)= realTimeOfTrial;
 zPlot(k) = z(1);
-zielTiefePlot(k) = zd(1);
+zielTiefePlot(k) = zielTiefe;
 k = k+1;
 else
     timePlot(1) =[];
@@ -38,16 +38,16 @@ positionVector1 = [0.1, 0.1, 0.3, 0.8];
 positionVector2 = [0.5, 0.1, 0.4, 0.4];
 %% Plot figure
 h1 = subplot('Position',positionVector1);
-plot(0, -z(1)); 
+plot(0, -z(); 
 %target depth and boundary lines
-line ([-0.1 0.1], [z(1) z(1)]) 
-line ([-0.1 0.1], [zd(1) zd(1)], 'color', 'green') 
-line ([-0.1 0.1], [zd(1)-positionTol zd(1)-positionTol], 'color', 'red') 
-line ([-0.1 0.1], [zd(1)+positionTol zd(1)+positionTol], 'color', 'red') 
+line ([-0.1 0.1], [z z]) 
+line ([-0.1 0.1], [zielTiefe zielTiefe], 'color', 'green') 
+line ([-0.1 0.1], [zielTiefe-positionTol zielTiefe-positionTol], 'color', 'red') 
+line ([-0.1 0.1], [zielTiefe+positionTol zielTiefe+positionTol], 'color', 'red') 
 %diving cell
-rectangle('Position', [-0.02, z(1)-0.045, 0.04, 0.09], 'FaceColor', 'cyan');
-rectangle('Position', [-0.01, z(1)+0.045+m, 0.02, h], 'FaceColor', 'red');
-axis([-0.05 0.05 zd(1)-0.10 zd(1)+0.10]);
+rectangle('Position', [-0.02, z-0.045, 0.04, 0.09], 'FaceColor', 'cyan');
+rectangle('Position', [-0.01, z+0.045+m, 0.02, h], 'FaceColor', 'red');
+axis([-0.05 0.05 zielTiefe-0.10 zielTiefe+0.10]);
 grid on;
 ylabel ('depth in m')
 set(gca,'xtick',[])
@@ -60,7 +60,7 @@ hold on;
 plot(timePlot,zielTiefePlot,'g')
 plot(timePlot,zielTiefePlot-positionTol,'r')
 plot(timePlot,zielTiefePlot+positionTol,'r')
-axis([realTimeOfTrial- 10, realTimeOfTrial, zd(1)-0.10, zd(1)+0.10]);
+axis([realTimeOfTrial- 10, realTimeOfTrial, zielTiefe-0.10, zielTiefe+0.10]);
 grid on;
 xlabel ('time in s');
 ylabel ('depth in m')
