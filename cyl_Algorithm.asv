@@ -3,7 +3,7 @@ clc;
 close all;
 %% Simulation Parameters
 zd = [0.7, 0.0, 0.0];                                           % target [zd, z_dotd, z_ddotd]          
-positionTol = 0.025;
+positionTol = 0.03;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 1000;
@@ -38,6 +38,7 @@ k = 1;
 timePlot(1)=0;
 zPlot(1)=0;
 zielTiefePlot(1)=0;
+showDisplay = 0;
 
 
 %% Loop 
@@ -123,9 +124,12 @@ if (newState==terminalState)
 end
 
 %% Resetting plot parameters (not part of the algorithm)
-if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
- realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
- show_cyl(z, zd, alpha, positionTol, time);  % visialization of the cylinder
+if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1   
+ showDisplay = 1;
+end
+if showDisplay == 1
+realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s
+show_cyl(z, zd, alpha, positionTol, time);  % visialization of the cylinder
 end
 %% %% Reinitiate State
 if (newState == terminalState)
@@ -143,9 +147,10 @@ while(true)
     [z, V]=dynamics(z, dt, V);                             % getting new state through nature
     alpha = ((V(1)/Adiaphr)*1000+10)/20*alpha_max;
     time = time +1;
-    if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
-        realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
-        show_cyl(z, zd, alpha, positionTol, time);  % visialization of the cylinder
+    realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s
+    if showDisplay == 1
+    realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s
+    show_cyl(z, zd, alpha, positionTol, time);  % visialization of the cylinder
     end
     state = get_state111(z, zd, positionTol);                      % calculation of the starting state
     if state ~= terminalState
@@ -159,9 +164,6 @@ while(true)
     end
 
 timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial                               
-%z(1) = zd(1)-0.01 + 2*rand(1)/100; 
-%z(2) = 0; 
-%alpha = 0;                            %reinitiation of the next trial
 else
 state = newState;                                               %updating state
 end

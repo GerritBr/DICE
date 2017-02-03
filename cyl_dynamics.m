@@ -13,8 +13,8 @@ tau = 0.025;                        % time for calculation = 0.025s
 alpha_max = 115;                           % max. angle of motor in one direction
 s_ges = 0.5;                                % time for complete change of Volume (-Vmax to Vmax)
 h = 0;                                      % stroke of diaphragm in m
-a_diaphr = 707/10^6;                        % area of diaphragm in m^2
-V_W = 0;                                    % variable volume of diving cell. Calculated through h and a_diaphr
+Adiaphr = 707/10^6;                        % area of diaphragm in m^2
+V_W = 0;                                    % variable volume of diving cell. Calculated through h and Adiaphr
 volumeStep = tau * alpha_max/(s_ges);   % max summable volume during calculation time
 %% Target depth
 zd(1) = 0.7;                            % target depth of diving cell
@@ -34,12 +34,13 @@ elseif (action == 2)
 end
 alpha = alpha_new;
 h_Hub = (-10 +20*(alpha/alpha_max)) /1000;      % calculate stroke of diaphragm in m
-V_W = a_diaphr * h_Hub;                     % calculating variable volume of diaphragm in m^3
+V_W = Adiaphr * h_Hub;                     % calculating variable volume of diaphragm in m^3
 %% equations of motion
 z_0 = [z(1); z(2)];
 zhat = zeros(2,1);
 zhat(1) = z_0(2);
 zhat(2) = zhat(1) + sign(zhat(1)) * zhat(1)^2 * k * tau / m_C + tau * rho_W * g * (V_W + V0 + V0_err) / m_C  - tau * g;
 % Return the new state variables (using Euler's method)
-new_z(1)  = z(1) + tau * zhat(2);
+new_z(1) = z(1) + tau * zhat(2);
 new_z(2) = zhat(2);
+new_z(3) = 0;

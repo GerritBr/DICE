@@ -1,5 +1,5 @@
 % This function displays the "animation"
-function [] = show_cyl(action, z, zd, alpha, positionTol, realTimeOfTrial)
+function [] = show_cyl(z, zd, alpha, positionTol, time)
 %% Defining global plot variables
 global timePlot
 global zPlot
@@ -21,7 +21,7 @@ else
 end
 %% Building plot vector of position
 if (k < 400)
-timePlot(k)= realTimeOfTrial;
+timePlot(k)= time*0.025;
 zPlot(k) = z(1);
 zielTiefePlot(k) = zd(1);
 k = k+1;
@@ -29,7 +29,7 @@ else
     timePlot(1) =[];
     zPlot(1) =[];
     zielTiefePlot(1) =[];
-    timePlot(k) = realTimeOfTrial;
+    timePlot(k) = time*0.025;
     zPlot(k) = z(1);
     zielTiefePlot(k) = zd(1);
 end
@@ -60,7 +60,7 @@ hold on;
 plot(timePlot,zielTiefePlot,'g')
 plot(timePlot,zielTiefePlot-positionTol,'r')
 plot(timePlot,zielTiefePlot+positionTol,'r')
-axis([realTimeOfTrial- 10, realTimeOfTrial, zd(1)-0.10, zd(1)+0.10]);
+axis([(time*0.025)- 10, (time*0.025), zd(1)-0.10, zd(1)+0.10]);
 grid on;
 xlabel ('time in s');
 ylabel ('depth in m')
