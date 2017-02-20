@@ -6,7 +6,7 @@ zd = [0.7, 0.0, 0.0, 0.0];                                       % target [zd, z
 positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
-timeBeforStartDisplay = 1000;
+timeBeforStartDisplay = 0;
 controler = 1;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
@@ -28,6 +28,7 @@ transitionProbs = zeros(terminalState, terminalState, 2)/terminalState;     % ma
 rewardCounts = zeros(terminalState, 2);                             % setting up reward counts
 reward = zeros(terminalState, 1);                                    % setting up rewards
 value = zeros(terminalState, 1);                                    % setting up values of the states
+den = zeros(terminalState, 1);
 end
 %end
 alpha =0;     % initial value of alpha
@@ -48,11 +49,11 @@ while (time < 5000000)
     actionValue1 = transitionProbs(state, : , 1) * value;       % calculating total value if action 1 is taken            
     actionValue2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
     %% Exploration moves with certain probability
-    if (numFailures<numFailuresBeforeExploStop)   
-        if(den(state)<500)
-    explo_prob = exploProbability;                            % exploration with certain probability
+    if (numFailures<numFailuresBeforeExploStop) 
+        if(den(state)>100)
+            explo_prob = 2*exploProbability;                            % exploration with certain probability
         else
-            explo_prob = 0;
+            explo_prob = exploProbability;
         end
     randomValue = rand(1);                                      % getting random value for determining exploratoin
     else

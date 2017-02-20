@@ -6,26 +6,22 @@ diam = 0.07;                        % diameter of cylinder in m
 height = 0.09;                      % height of cylinder in m
 V0 = pi/4 * diam^2 * height;        % volume of cylinder in m^3
 m_C = rho_W*V0;                     % mass of cylinder in kg
-m_err = 0.01*m_C;
-lambda= 1;
-Kappa = 1;
-steepness = 0.5;
-dhat=0;
-eta = 10;
-a = 2;
+V_err = 0.01*V0;
 Vmax = 0.05*V0/2;
+%Control parameters
+lambda= 2;
+phi = 0.2;
+eta = 1;
+a = 0.4;
 %error variables
 z_err(1) = z(1)-zd(1);                  % position error
 z_err(2) = z(2)-zd(2);                  % velocity error
 z_err(3) = z(3)-zd(3);
 %sliding surface
 %% Control force signum function
-% SMC for equation of motion 2nd order
-%s=z_err(2)+lambda*z_err(1);        % sliding surface
-%Vc=(1/(m_C*(m_C*g))*(-rho_W*g*V0+m_C*g+k*sign(z(2))*z(2)^2)+m_C*(zd(3)-lambda*z_err(2))-(1/sqrt(2)*m_C*Kappa*sat(s, steepness)));
 % SMC for equation of motion 3rd order
 s=z_err(3)+2*lambda*z_err(2)+lambda^2*z_err(1);
-Vc = -1/(a*(rho_W*g + m_err)) * (a*rho_W*g*V(1) - 2*k*z(3)*abs(z(2)) - m_C*(zd(4) - 2*lambda*z_err(3) - lambda^2*z_err(2)) + 0*dhat + eta*sat(s, steepness));
+Vc = -1/(a*(rho_W*g)) * (a*rho_W*g*(V(1)+V_err) - 2*k*z(3)*abs(z(2)) - m_C*(zd(4) - 2*lambda*z_err(3) - lambda^2*z_err(2)) + eta*sat(s, phi));
 if Vc<0
     if Vc < -Vmax
         V(2) = -Vmax;
@@ -39,11 +35,11 @@ else
         V(2) = Vc;
     end
 end
-function y=sat(s,steepness)
-kk=1/steepness;
+function y=sat(s,phi)
+kk=1/phi;
 % sat is the saturation function with unit limits and unit slope.
-if abs(s)>steepness
-% elseif x<-steepness 
+if abs(s)>phi
+% elseif x<-phi 
 y=sign(s);
 else 
 y=kk*s;
