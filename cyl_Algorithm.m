@@ -5,7 +5,7 @@ close all;
 zd = [0.7, 0.0, 0.0, 0.0];                                       % target [zd, z_dotd, z_ddotd, z_dddotdes]          
 positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 5000;                               % number of failures before exploration of the environment stops
+numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 1000;
 controler = 1;
 wave = 0;                                                       % produces a wave signal for zielTiefe
@@ -49,7 +49,7 @@ while (time < 5000000)
     actionValue2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
     %% Exploration moves with certain probability
     if (numFailures<numFailuresBeforeExploStop)   
-        if(den(state)<300)
+        if(den(state)<500)
     explo_prob = exploProbability;                            % exploration with certain probability
         else
             explo_prob = 0;
