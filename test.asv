@@ -11,8 +11,5 @@ end
 n
 
 for i=1:terminalState
-    for a=1:2
-        Transitions(i) = sum(transitionCounts(i,:,a));
-    end
-end
-transpose(Transitions)
+    for l=1:terminalState
+        Transitions(s) = 
