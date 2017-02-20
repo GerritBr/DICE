@@ -2,23 +2,24 @@
 clc;
 close all;
 %% Simulation Parameters
-zd = [0.7, 0.0, 0.0];                                           % target [zd, z_dotd, z_ddotd]          
-positionTol = 0.025;
+zd = [0.7, 0.0, 0.0, 0.0];                                       % target [zd, z_dotd, z_ddotd, z_dddotdes]          
+positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
-numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
+numFailuresBeforeExploStop = 100;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 1000;
+controler = 1;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
-tolerance   = 0.001;                                            % tolerance of change in value
+tolerance   = 0.1;                                            % tolerance of change in value
 %% Timeparameters
 time = 0;                                                       % overall timsteps of calculation
 timeStepsToFailure = [];                                        % timesteps before failure happened
 numFailures = 0;                                                % initial value of Failures
 timeAtStartOfCurrentTrial = 0;                                  % initial timestep 
 %% Sarting state
-z = [zd(1), 0.0, 0.0];                                      % starting state [z, z_dot, z_ddot];
-state = get_state111(z, zd, positionTol);                      % calculation of the starting state
+z = [0.6, 0.0, 0.0];                                            % starting state [z, z_dot, z_ddot];
+state = get_state111(z, zd, positionTol);                       % calculation of the starting state
 terminalState   = 111;                                              % number of total states+2 (from get_state111)
 %% Setup of transition and reward
 if (useExistingProperties == 0)
@@ -28,6 +29,7 @@ rewardCounts = zeros(terminalState, 2);                             % setting up
 reward = zeros(terminalState, 1);                                    % setting up rewards
 value = zeros(terminalState, 1);                                    % setting up values of the states
 end
+%end
 alpha =0;     % initial value of alpha
 %% Definition of plot parameter (not part of the algorithm)
 global timePlot;
@@ -131,6 +133,8 @@ end
 if (newState == terminalState)
 numFailures = numFailures + 1                                       %number of Failures
 timeStepsToFailure(numFailures) = time - timeAtStartOfCurrentTrial; %vector consiting of number of time steps 
+
+if (controler == 1)
 dt=0.025;
 Adiaphr = 707/10^6;                        % area of diaphragm in m^2
 alpha_max = 115;
@@ -138,11 +142,10 @@ V = [0,0];
 V(1) = Adiaphr * (-10 +20*(alpha/alpha_max)) /1000;
 zaehl = 0;
 while(true)
-    [V] = controller(z, V, zd);
-    [V] = dynamicsDiaphragm(V, dt);
-    [z, V]=dynamics(z, dt, V);                             % getting new state through nature
+    [V] = SMC_controller(z, V, zd);
+    [z, V]=SMC_dynamics(z, dt, V);                             % getting new state through nature
     alpha = ((V(1)/Adiaphr)*1000+10)/20*alpha_max;
-    time = time +1;
+    time = time + 1;
     if (time-timeAtStartOfCurrentTrial)*0.025 > timeBeforStartDisplay       %displayStarted==1
         realTimeOfTrial = (time-timeAtStartOfCurrentTrial)*0.025;       % duration of current trial in s               
         show_cyl(z, zd, alpha, positionTol, time);  % visialization of the cylinder
@@ -156,12 +159,13 @@ while(true)
     if zaehl > 100
     break;
     end
-    end
-
-timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial                               
-%z(1) = zd(1)-0.01 + 2*rand(1)/100; 
-%z(2) = 0; 
-%alpha = 0;                            %reinitiation of the next trial
+end
+else                       
+z(1) = zd(1)-0.01 + 2*rand(1)/100; 
+z(2) = 0; 
+alpha = 0;                            %reinitiation of the next trial
+end
+timeAtStartOfCurrentTrial = time;                                   %time of learning at start current trial        
 else
 state = newState;                                               %updating state
 end

@@ -1,4 +1,4 @@
-function [z, V] = SMC_dynamics(z, dt, V)
+function [z, V] = dynamics(z, dt, V)
 rho_W = 1000;                       % density of water in m^3/kg
 g = 9.81;                           % gravitional acc  in m/s^2
 k = 1;                              % visc. damping constant
