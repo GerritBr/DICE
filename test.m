@@ -10,8 +10,9 @@ for i=1:terminalState
 end
 n
 
+for a=1:2
 for i=1:terminalState
-    for a=1:2
+    
         Transitions(i) = sum(transitionCounts(i,:,a));
     end
 end
