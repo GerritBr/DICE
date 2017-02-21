@@ -7,7 +7,7 @@ positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
 timeBeforStartDisplay = 1000;
-controler = 0;
+controler = 1;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
