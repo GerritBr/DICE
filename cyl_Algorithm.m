@@ -6,8 +6,8 @@ zd = [0.7, 0.0, 0.0, 0.0];                                       % target [zd, z
 positionTol = 0.01;
 useExistingProperties = 0;                                      % 0 = new learning tast; 1 = use existing properties
 numFailuresBeforeExploStop = 400;                               % number of failures before exploration of the environment stops
-timeBeforStartDisplay = 0;
-controler = 1;
+timeBeforStartDisplay = 1000;
+controler = 0;
 wave = 0;                                                       % produces a wave signal for zielTiefe
 gamma = 0.9;                                                    % dicounting factor     
 exploProbability = 0.10;                                        % probability of an explorational action
@@ -50,12 +50,8 @@ while (time < 5000000)
     actionValue2 = transitionProbs(state, : , 2) * value;       % calculating total value if action 2 is taken
     %% Exploration moves with certain probability
     if (numFailures<numFailuresBeforeExploStop) 
-        if(den(state)>100)
-            explo_prob = 2*exploProbability;                            % exploration with certain probability
-        else
-            explo_prob = exploProbability;
-        end
-    randomValue = rand(1);                                      % getting random value for determining exploratoin
+        explo_prob = exploProbability;                              % exploration with certain probability
+        randomValue = rand(1);                                      % getting random value for determining exploratoin
     else
     explo_prob = 0;
     end
@@ -99,9 +95,9 @@ rewardCounts(newState, 2) = rewardCounts(newState, 2) +1;       % updating rewad
 if (newState==terminalState)                                        
     for a = 1:2                                                     % updating transition probabilities of all states under action 1/2
         for s = 1:terminalState                                            
-            den(s) = sum(transitionCounts(s,:,a));                             % summing up all transitions in state s under action a
-                if (den(s) > 0)
-                transitionProbs(s, :, a) = transitionCounts(s, :, a) /den(s);      % calculating new probability through transitionConts and den
+            den = sum(transitionCounts(s,:,a));                             % summing up all transitions in state s under action a
+                if (den > 0)
+                transitionProbs(s, :, a) = transitionCounts(s, :, a) /den;      % calculating new probability through transitionConts and den
                 end
         end
     end

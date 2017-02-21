@@ -7,7 +7,7 @@ height = 0.09;                      % height of cylinder in m
 V0 = pi/4 * diam^2 * height;        % volume of cylinder in m^3
 m_C = rho_W*V0;                     % mass of cylinder in kg
 V_err = 0.01*V0;
-a = 2;
+a = 0.4;
 %explicit euler to determine next velocity 
 velocity_before = z(2);
 velocity_next = velocity_before + ((rho_W*g*(V0+V(1)+V_err)/m_C)-g-(k*sign(velocity_before)*velocity_before^2)/m_C)*dt;

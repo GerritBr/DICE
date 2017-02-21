@@ -7,9 +7,9 @@ height = 0.09;                      % height of cylinder in m
 V0 = pi/4 * diam^2 * height;        % volume of cylinder in m^3
 m_C = rho_W*V0;                     % mass of cylinder in kg
 V_err = 0.01*V0;
-Vmax = 0.05*V0/2;
+Vmax = 0.05*V0;
 %Control parameters
-lambda= 2;
+lambda= 0.6;
 phi = 0.2;
 eta = 1;
 a = 0.4;
